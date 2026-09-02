@@ -1,0 +1,10 @@
+- generic [ref=e4]:
+  - heading "VisitBiH" [level=1] [ref=e10]
+  - paragraph [ref=e11]: Save and organize places to visit in Bosnia and Herzegovina.
+  - generic [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]: Email
+      - textbox "Email" [active] [ref=e15]:
+        - /placeholder: you@example.com
+    - button "Continue" [ref=e16] [cursor=pointer]
+  - paragraph [ref=e17]: No account yet? Just enter your email — we'll create one for you.

@@ -1,0 +1,68 @@
+- generic [ref=e18]:
+  - banner [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e26]:
+        - heading "VisitBiH" [level=1] [ref=e27]
+        - paragraph [ref=e28]: afanpecenkovic@gmail.com
+      - button "Log out" [ref=e29] [cursor=pointer]
+  - main [ref=e30]:
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - paragraph [ref=e38]: Total links
+        - paragraph [ref=e39]: "3"
+      - generic [ref=e40]:
+        - paragraph [ref=e51]: Cities
+        - paragraph [ref=e52]: "3"
+      - generic [ref=e53]:
+        - paragraph [ref=e59]: Per city
+        - list [ref=e60]:
+          - listitem [ref=e61]:
+            - generic [ref=e62]: bbg
+            - generic [ref=e63]: "1"
+          - listitem [ref=e64]:
+            - generic [ref=e65]: bgg
+            - generic [ref=e66]: "1"
+          - listitem [ref=e67]:
+            - generic [ref=e68]: Bihac
+            - generic [ref=e69]: "1"
+    - button "Add a link" [ref=e71] [cursor=pointer]
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]: bbg
+          - generic [ref=e81]: (1)
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - link "ggg" [ref=e85] [cursor=pointer]:
+              - /url: https://afanburch.app.n8n.cloud/workflow/3mYxsgmfPV668BUL?new=true
+            - paragraph [ref=e86]: https://afanburch.app.n8n.cloud/workflow/3mYxsgmfPV668BUL?new=true
+            - paragraph [ref=e87]: wowww
+          - generic [ref=e88]:
+            - button "Edit" [ref=e89] [cursor=pointer]
+            - button "Delete" [ref=e92] [cursor=pointer]
+      - generic [ref=e95]:
+        - generic [ref=e96]:
+          - generic [ref=e97]: bgg
+          - generic [ref=e101]: (1)
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - link "bg" [ref=e105] [cursor=pointer]:
+              - /url: https://bihac.org/
+            - paragraph [ref=e106]: https://bihac.org/
+            - paragraph [ref=e107]: gbg
+          - generic [ref=e108]:
+            - button "Edit" [ref=e109] [cursor=pointer]
+            - button "Delete" [ref=e112] [cursor=pointer]
+      - generic [ref=e115]:
+        - generic [ref=e116]:
+          - generic [ref=e117]: Bihac
+          - generic [ref=e121]: (1)
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - link "Una" [ref=e125] [cursor=pointer]:
+              - /url: https://hr.wikipedia.org/wiki/Biha%C4%87
+            - paragraph [ref=e126]: https://hr.wikipedia.org/wiki/Biha%C4%87
+            - paragraph [ref=e127]: beautiful city next to a river
+          - generic [ref=e128]:
+            - button "Edit" [ref=e129] [cursor=pointer]
+            - button "Delete" [ref=e132] [cursor=pointer]

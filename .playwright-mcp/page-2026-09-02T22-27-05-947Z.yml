@@ -1,0 +1,10 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e11]:
+        - heading "VisitBiH" [level=1] [ref=e12]
+        - paragraph [ref=e13]: afanpecenkovic@gmail.com
+      - button "Log out" [ref=e14] [cursor=pointer]
+  - main [ref=e15]:
+    - paragraph [ref=e16]: Loading…
+    - button "Add a link" [ref=e18] [cursor=pointer]
