@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import LinkForm from './LinkForm';
 import { useLinksStore } from '../store/useLinksStore';
+import { PencilIcon, TrashIcon } from './icons';
 
 export default function LinkCard({ link }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -24,13 +25,13 @@ export default function LinkCard({ link }) {
   }
 
   return (
-    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4">
+    <div className="group flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md">
       <div className="min-w-0">
         <a
           href={link.url}
           target="_blank"
           rel="noreferrer"
-          className="break-words font-medium text-slate-900 hover:underline"
+          className="break-words font-medium text-slate-900 hover:text-teal-700 hover:underline"
         >
           {link.title}
         </a>
@@ -38,15 +39,20 @@ export default function LinkCard({ link }) {
         {link.description && <p className="mt-1 text-sm text-slate-600">{link.description}</p>}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
-        <button onClick={() => setIsEditing(true)} className="text-sm text-slate-500 hover:text-slate-900">
+        <button
+          onClick={() => setIsEditing(true)}
+          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-teal-700 hover:bg-teal-50"
+        >
+          <PencilIcon className="h-3.5 w-3.5" />
           Edit
         </button>
         <button
           onClick={() => {
             if (confirm(`Delete "${link.title}"?`)) removeLink(link.id);
           }}
-          className="text-sm text-red-500 hover:text-red-700"
+          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-700"
         >
+          <TrashIcon className="h-3.5 w-3.5" />
           Delete
         </button>
       </div>

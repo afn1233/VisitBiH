@@ -42,7 +42,7 @@ export default function LinkForm({ initialValues, onSubmit, onCancel, submitLabe
           value={values.description}
           onChange={handleChange('description')}
           rows={2}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
 
@@ -52,7 +52,7 @@ export default function LinkForm({ initialValues, onSubmit, onCancel, submitLabe
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+          className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
         >
           {isSubmitting ? 'Saving…' : submitLabel}
         </button>
@@ -77,7 +77,7 @@ function Field({ label, type = 'text', ...props }) {
       <input
         type={type}
         {...props}
-        className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+        className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
       />
     </div>
   );

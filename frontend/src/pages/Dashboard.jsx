@@ -4,6 +4,7 @@ import { useLinksStore } from '../store/useLinksStore';
 import StatsSummary from '../components/StatsSummary';
 import LinkForm from '../components/LinkForm';
 import LinkList from '../components/LinkList';
+import { CompassIcon, PlusIcon } from '../components/icons';
 
 export default function Dashboard() {
   const user = useAuthStore((s) => s.user);
@@ -23,26 +24,31 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50/50 via-slate-50 to-teal-50/60">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">VisitBiH</h1>
-            <p className="text-sm text-slate-500">{user?.email}</p>
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-5">
+          <div className="flex items-center gap-2.5">
+            <span className="rounded-lg bg-teal-50 p-1.5 text-teal-600">
+              <CompassIcon className="h-6 w-6" />
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">VisitBiH</h1>
+              <p className="text-sm text-slate-500">{user?.email}</p>
+            </div>
           </div>
-          <button onClick={handleLogout} className="text-sm text-slate-500 hover:text-slate-900">
+          <button onClick={handleLogout} className="text-sm font-medium text-slate-500 hover:text-teal-700">
             Log out
           </button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
+      <main className="mx-auto max-w-4xl space-y-8 px-4 py-8">
         {isLoading && <p className="text-sm text-slate-400">Loading…</p>}
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <StatsSummary stats={stats} />
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           {showAddForm ? (
             <LinkForm
               submitLabel="Add link"
@@ -55,9 +61,10 @@ export default function Dashboard() {
           ) : (
             <button
               onClick={() => setShowAddForm(true)}
-              className="w-full rounded-lg border border-dashed border-slate-300 py-3 text-sm font-medium text-slate-500 hover:border-slate-400 hover:text-slate-700"
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
             >
-              + Add a link
+              <PlusIcon className="h-4 w-4" />
+              Add a link
             </button>
           )}
         </div>
