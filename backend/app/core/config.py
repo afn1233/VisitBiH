@@ -15,7 +15,15 @@ class Settings(BaseSettings):
     n8n_webhook_url: str | None = None
     link_enrichment_api_key: str | None = None
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    # "Ask your links" (RAG) - both optional, same degrade-gracefully pattern
+    # as the n8n settings above. Unset means embedding/asking is a no-op.
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
+
+    # ignore="extra" - .env also carries N8N_BASIC_AUTH_USER/PASSWORD, which
+    # are for docker-compose.yml's ${...} substitution, not this app; without
+    # this, pydantic-settings rejects the whole file over vars it doesn't own.
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 
 settings = Settings()

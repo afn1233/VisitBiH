@@ -4,6 +4,7 @@ import { useLinksStore } from '../store/useLinksStore';
 import StatsSummary from '../components/StatsSummary';
 import LinkForm from '../components/LinkForm';
 import LinkList from '../components/LinkList';
+import AskBox from '../components/AskBox';
 import { CompassIcon, PlusIcon } from '../components/icons';
 
 export default function Dashboard() {
@@ -69,6 +70,8 @@ export default function Dashboard() {
             </button>
           )}
         </div>
+
+        <AskBox />
 
         {!isLoading && <LinkList links={links} />}
       </main>
