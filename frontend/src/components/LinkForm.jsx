@@ -4,7 +4,15 @@ const EMPTY_VALUES = { city: '', title: '', url: '', description: '' };
 
 // Shared by "add a link" and "edit a link" - same fields, same validation,
 // just different initial values and an onSubmit that either creates or updates.
-export default function LinkForm({ initialValues, onSubmit, onCancel, submitLabel = 'Save' }) {
+// Title is optional on add (blank -> n8n fills it in from the page) but required
+// on edit (a link being edited already has one) - callers set titleRequired accordingly.
+export default function LinkForm({
+  initialValues,
+  onSubmit,
+  onCancel,
+  submitLabel = 'Save',
+  titleRequired = true,
+}) {
   const [values, setValues] = useState({ ...EMPTY_VALUES, ...initialValues });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -18,7 +26,7 @@ export default function LinkForm({ initialValues, onSubmit, onCancel, submitLabe
     try {
       await onSubmit({
         city: values.city.trim(),
-        title: values.title.trim(),
+        title: values.title.trim() || null,
         url: values.url.trim(),
         description: values.description.trim() ? values.description.trim() : null,
       });
@@ -33,7 +41,17 @@ export default function LinkForm({ initialValues, onSubmit, onCancel, submitLabe
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="City" value={values.city} onChange={handleChange('city')} required />
-        <Field label="Title" value={values.title} onChange={handleChange('title')} required />
+        <div>
+          <Field
+            label="Title"
+            value={values.title}
+            onChange={handleChange('title')}
+            required={titleRequired}
+          />
+          {!titleRequired && (
+            <p className="mt-1 text-xs text-slate-400">Leave blank to auto-fill from the page</p>
+          )}
+        </div>
       </div>
       <Field label="URL" type="url" value={values.url} onChange={handleChange('url')} required />
       <div>

@@ -13,6 +13,7 @@ Two fully separate projects in one repo, each with its own dependencies and READ
 - **Save links per city.** Each saved location is a link with a city, title, URL, and optional description.
 - **Manage your links.** Add, edit, and delete inline from the dashboard — always scoped to your own account.
 - **See stats at a glance.** A live breakdown of how many links you've saved per city, computed on the fly (no separate stats table to keep in sync).
+- **Get links checked automatically.** Leave the title blank and skip checking the URL yourself — an n8n workflow verifies it's reachable, fills in the page title, and grabs a preview image, all in the background after you hit save.
 
 ## Tech stack
 
@@ -28,6 +29,9 @@ Two fully separate projects in one repo, each with its own dependencies and READ
 - Tailwind CSS
 - Zustand (state management)
 
+**Automation**
+- n8n (self-hosted, via `docker-compose`) — link reachability checks, title/preview-image fetching
+
 ## Setup / Run
 
 **1. Start Postgres and the API (`backend/`):**
@@ -41,7 +45,7 @@ copy .env.example .env
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
-API is now running at `http://localhost:8000` (interactive docs at `/docs`).
+API is now running at `http://localhost:8000` (interactive docs at `/docs`). `docker compose up -d` also starts a local n8n instance at `http://localhost:5678` for link enrichment — see [backend/README.md](backend/README.md#link-enrichment-n8n) to wire up the workflow (optional; the app works fine without it, links just stay in a "pending" enrichment state).
 
 **2. Start the frontend (`frontend/`):**
 ```
@@ -61,7 +65,7 @@ Login (`POST /auth/login`) takes only an email. The backend looks it up, creatin
 
 ## Data model
 
-Two tables: `users` (id, email, created_at) and `links` (id, user_id, city, title, url, description, created_at, updated_at). See `backend/app/models/` for the SQLAlchemy definitions and `backend/alembic/versions/` for the migration history.
+Two tables: `users` (id, email, created_at) and `links` (id, user_id, city, title, url, description, enrichment_status, preview_image_url, checked_at, created_at, updated_at). See `backend/app/models/` for the SQLAlchemy definitions and `backend/alembic/versions/` for the migration history.
 
 ## Features
 
@@ -71,6 +75,7 @@ What's been built so far, beyond the core CRUD app:
 - **Per-city link organization** with inline add/edit/delete and a shared `LinkForm` component for both flows.
 - **Live stats** summarizing saved links by city, computed from the user's links rather than stored separately.
 - **Ownership enforcement** on every link mutation, independent of query filtering (`_get_owned_link_or_404` in `links.py`).
+- **Link validation / enrichment via n8n.** After a link is created, an n8n workflow checks whether the URL is actually reachable, auto-fetches the page title if you left it blank, and grabs an Open Graph preview image when one exists — results show up on the link's card (a reachable/unreachable badge, plus a thumbnail) once n8n reports back. See [backend/README.md](backend/README.md#link-enrichment-n8n) for the workflow setup.
 
 ### AI-assisted development tooling
 

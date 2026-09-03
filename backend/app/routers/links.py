@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.crud import link as link_crud
@@ -8,6 +8,7 @@ from app.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.link import LinkCreate, LinkOut, LinkUpdate
+from app.services.enrichment import trigger_enrichment
 
 router = APIRouter(prefix="/links", tags=["links"])
 
@@ -29,10 +30,13 @@ def list_links(db: Session = Depends(get_db), user: User = Depends(get_current_u
 @router.post("", response_model=LinkOut, status_code=status.HTTP_201_CREATED)
 def create_link(
     payload: LinkCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return link_crud.create(db, user.id, payload)
+    link = link_crud.create(db, user.id, payload)
+    background_tasks.add_task(trigger_enrichment, link.id, link.url)
+    return link
 
 
 @router.put("/{link_id}", response_model=LinkOut)

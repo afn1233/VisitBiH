@@ -17,9 +17,12 @@ class Link(Base):
         index=True,
     )
     city = Column(String, nullable=False)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=True)  # blank at creation -> filled in by n8n enrichment
     url = Column(String, nullable=False)
     description = Column(Text, nullable=True)
+    enrichment_status = Column(String, nullable=False, server_default="pending")
+    preview_image_url = Column(String(2048), nullable=True)
+    checked_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime(timezone=True),

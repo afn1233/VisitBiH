@@ -1,0 +1,203 @@
+{
+  "name": "VisitBiH Link Enrichment",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "link-check",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "b1e2c3a4-0000-4000-8000-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-600, 300],
+      "webhookId": "link-check-webhook"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.body.url }}",
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "b1e2c3a4-0000-4000-8000-000000000002",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-360, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "sourceData": "json",
+        "dataPropertyName": "data",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "title",
+              "returnValue": "text"
+            },
+            {
+              "key": "preview_image_url",
+              "cssSelector": "meta[property=\"og:image\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1e2c3a4-0000-4000-8000-000000000003",
+      "name": "Extract Title & Preview Image",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [-120, 140]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1a1a1a1-0000-4000-8000-000000000001",
+              "name": "is_reachable",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "id": "a1a1a1a1-0000-4000-8000-000000000002",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "id": "a1a1a1a1-0000-4000-8000-000000000003",
+              "name": "preview_image_url",
+              "type": "string",
+              "value": "={{ $json.preview_image_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1e2c3a4-0000-4000-8000-000000000004",
+      "name": "Shape Reachable Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [120, 140]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b2b2b2b2-0000-4000-8000-000000000001",
+              "name": "is_reachable",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "id": "b2b2b2b2-0000-4000-8000-000000000002",
+              "name": "title",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "b2b2b2b2-0000-4000-8000-000000000003",
+              "name": "preview_image_url",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1e2c3a4-0000-4000-8000-000000000005",
+      "name": "Shape Unreachable Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-120, 460]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8000/links/{{ $('Webhook').first().json.body.link_id }}/enrichment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Enrichment-Secret",
+              "value": "={{ $env.LINK_ENRICHMENT_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "b1e2c3a4-0000-4000-8000-000000000006",
+      "name": "Report to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [360, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "HTTP Request", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          { "node": "Extract Title & Preview Image", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Shape Unreachable Result", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Extract Title & Preview Image": {
+      "main": [
+        [
+          { "node": "Shape Reachable Result", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Shape Reachable Result": {
+      "main": [
+        [
+          { "node": "Report to Backend", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Shape Unreachable Result": {
+      "main": [
+        [
+          { "node": "Report to Backend", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

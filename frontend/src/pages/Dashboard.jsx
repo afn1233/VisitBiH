@@ -52,6 +52,7 @@ export default function Dashboard() {
           {showAddForm ? (
             <LinkForm
               submitLabel="Add link"
+              titleRequired={false}
               onCancel={() => setShowAddForm(false)}
               onSubmit={async (data) => {
                 await addLink(data);

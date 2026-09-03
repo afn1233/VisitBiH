@@ -12,3 +12,6 @@ dist/
 
 # IDE
 .idea/
+
+# Playwright MCP scratch output (screenshots/logs from browser-driven testing)
+.playwright-mcp/
