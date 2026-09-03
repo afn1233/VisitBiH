@@ -56,3 +56,20 @@ def set_enrichment(db: Session, link: Link, data: LinkEnrichmentIn) -> Link:
     db.commit()
     db.refresh(link)
     return link
+
+
+def set_embedding(db: Session, link: Link, embedding: list[float]) -> Link:
+    link.embedding = embedding
+    db.commit()
+    db.refresh(link)
+    return link
+
+
+def get_embedded_for_user(db: Session, user_id: uuid.UUID) -> list[Link]:
+    """Links with a stored embedding, for /ask's similarity search - excludes
+    links saved before an OPENAI_API_KEY was configured, or while it's unset."""
+    return (
+        db.query(Link)
+        .filter(Link.user_id == user_id, Link.embedding.isnot(None))
+        .all()
+    )

@@ -8,6 +8,7 @@ from app.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.link import LinkCreate, LinkOut, LinkUpdate
+from app.services.embeddings import embed_text, link_embedding_text
 from app.services.enrichment import trigger_enrichment
 
 router = APIRouter(prefix="/links", tags=["links"])
@@ -20,6 +21,16 @@ def _get_owned_link_or_404(db: Session, link_id: uuid.UUID, user: User):
     if link.user_id != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your link")
     return link
+
+
+def _embed_link(db: Session, link) -> None:
+    """Best-effort: embed the link for /ask's similarity search. A single
+    small OpenAI call (~100-300ms), fast enough to do inline rather than as a
+    background task. Silently skipped if OPENAI_API_KEY isn't configured."""
+    text = link_embedding_text(link.city, link.title, link.url, link.description)
+    embedding = embed_text(text)
+    if embedding is not None:
+        link_crud.set_embedding(db, link, embedding)
 
 
 @router.get("", response_model=list[LinkOut])
@@ -36,6 +47,7 @@ def create_link(
 ):
     link = link_crud.create(db, user.id, payload)
     background_tasks.add_task(trigger_enrichment, link.id, link.url)
+    _embed_link(db, link)
     return link
 
 
@@ -47,7 +59,9 @@ def update_link(
     user: User = Depends(get_current_user),
 ):
     link = _get_owned_link_or_404(db, link_id, user)
-    return link_crud.update(db, link, payload)
+    link = link_crud.update(db, link, payload)
+    _embed_link(db, link)
+    return link
 
 
 @router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)

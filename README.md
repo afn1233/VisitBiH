@@ -14,6 +14,7 @@ Two fully separate projects in one repo, each with its own dependencies and READ
 - **Manage your links.** Add, edit, and delete inline from the dashboard — always scoped to your own account.
 - **See stats at a glance.** A live breakdown of how many links you've saved per city, computed on the fly (no separate stats table to keep in sync).
 - **Get links checked automatically.** Leave the title blank and skip checking the URL yourself — an n8n workflow verifies it's reachable, fills in the page title, and grabs a preview image, all in the background after you hit save.
+- **Ask questions about your saved links.** A search box on the dashboard finds the links that actually answer your question and has Claude summarize them, citing which ones it used.
 
 ## Tech stack
 
@@ -31,6 +32,10 @@ Two fully separate projects in one repo, each with its own dependencies and READ
 
 **Automation**
 - n8n (self-hosted, via `docker-compose`) — link reachability checks, title/preview-image fetching
+
+**AI / RAG**
+- OpenAI embeddings (`text-embedding-3-small`) — no vector database, similarity search runs in plain Python over a plain array column
+- Claude (Haiku 4.5, via the official `anthropic` SDK) — answers questions using the user's own matching saved links as context
 
 ## Setup / Run
 
@@ -65,7 +70,7 @@ Login (`POST /auth/login`) takes only an email. The backend looks it up, creatin
 
 ## Data model
 
-Two tables: `users` (id, email, created_at) and `links` (id, user_id, city, title, url, description, enrichment_status, preview_image_url, checked_at, created_at, updated_at). See `backend/app/models/` for the SQLAlchemy definitions and `backend/alembic/versions/` for the migration history.
+Two tables: `users` (id, email, created_at) and `links` (id, user_id, city, title, url, description, enrichment_status, preview_image_url, checked_at, embedding, created_at, updated_at). See `backend/app/models/` for the SQLAlchemy definitions and `backend/alembic/versions/` for the migration history.
 
 ## Features
 
@@ -76,6 +81,7 @@ What's been built so far, beyond the core CRUD app:
 - **Live stats** summarizing saved links by city, computed from the user's links rather than stored separately.
 - **Ownership enforcement** on every link mutation, independent of query filtering (`_get_owned_link_or_404` in `links.py`).
 - **Link validation / enrichment via n8n.** After a link is created, an n8n workflow checks whether the URL is actually reachable, auto-fetches the page title if you left it blank, and grabs an Open Graph preview image when one exists — results show up on the link's card (a reachable/unreachable badge, plus a thumbnail) once n8n reports back. See [backend/README.md](backend/README.md#link-enrichment-n8n) for the workflow setup.
+- **Ask your links (RAG), deliberately minimal.** Every link is embedded (OpenAI) on save; asking a question runs a plain cosine-similarity search in Python — no vector database — over the matching links, then Claude (Haiku 4.5) answers using only those as context. See [backend/README.md](backend/README.md#ask-your-links-rag) for the setup and the reasoning behind skipping a vector DB.
 
 ### AI-assisted development tooling
 
@@ -88,4 +94,4 @@ This project is also set up to use Claude Code's extended tooling during develop
 
 ## What's deliberately not here yet
 
-Per the original brief, this is scoped to auth + CRUD + simple stats only. No RAG/AI features on the app side — the `links` table is just structured enough (one clean row per link, addressable by UUID) that hooking a future "ask questions about your saved spots" pipeline onto it later shouldn't require reshaping the data. Mobile isn't in this repo yet either.
+The RAG feature is intentionally the simplest version that works: no vector database, no backfill step (a link saved before the OpenAI/Anthropic keys were set only becomes searchable once it's edited again), no chat history — one question in, one answer out. Mobile isn't in this repo yet either.

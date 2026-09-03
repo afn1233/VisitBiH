@@ -99,3 +99,22 @@ curl -X POST http://localhost:8000/links/<id>/enrichment \
   -H "Content-Type: application/json" \
   -d '{"is_reachable": true, "title": "Example", "preview_image_url": "https://example.com/img.png"}'
 ```
+
+## Ask your links (RAG)
+
+A search box on the dashboard: ask a question in plain language, and the API finds your own saved links that are semantically relevant and has Claude write an answer, citing which links it used.
+
+Deliberately minimal - no vector database. Each link's embedding is stored as a plain array column on `links` and compared with the question's embedding via plain-Python cosine similarity at question time, which is fast enough at personal-bookmark scale. No new container, no `docker-compose.yml` changes.
+
+- **Embeddings**: OpenAI `text-embedding-3-small`, computed on every link create/edit (`app/services/embeddings.py`).
+- **Answer generation**: Claude Haiku 4.5 via the official `anthropic` SDK, given the question plus the top-matching links as context (`app/services/rag.py`).
+- **Endpoint**: `POST /ask` - unlike the n8n callback, this is a normal JWT-authenticated, user-scoped endpoint (`{"question": "..."}` in, `{"answer": "...", "sources": [...]}` out).
+
+### Setup
+
+Set both keys in `.env`:
+```
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+```
+Leave either blank to disable the feature entirely - links still save normally (just without an embedding), and `/ask` returns a clear 503 instead of crashing. Links saved before the keys were set won't be searchable until edited (which re-embeds them) - there's no backfill step in this minimal version.
